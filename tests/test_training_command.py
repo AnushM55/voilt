@@ -1,9 +1,18 @@
-from pathlib import Path
+import sys
 
-from scripts.train_edge_model import build_command
+from scripts.train import parse_args
 
 
-def test_training_command_builder() -> None:
-    command = build_command(Path("dataset/data.yaml"), "yolo11n.pt", 60, 640)
-    assert "yolo detect train" in command
-    assert "data=dataset/data.yaml" in command
+def test_training_parse_args_defaults(monkeypatch) -> None:
+    monkeypatch.setattr(sys, "argv", ["train.py"])
+
+    args = parse_args()
+
+    assert args.data == "dataset/data.yaml"
+    assert args.model == "yolo11n.pt"
+    assert args.epochs == 100
+    assert args.imgsz == 640
+    assert args.batch == 16
+    assert args.device == "0"
+    assert args.project == "runs"
+    assert args.name == "voilt-edge"
