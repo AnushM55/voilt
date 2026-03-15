@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Tooling caches and runtime artifacts
+.ruff_cache/
+*.db
+runs/
+dataset/
+edge/evidence
+IMPLEMENTATION.md
