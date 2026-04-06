@@ -38,13 +38,25 @@ class ProcessResponse(BaseModel):
 
 
 def _read_image(job: dict) -> bytes:
-    """Return raw image bytes from the job payload (base64 embedded or file path)."""
+    """Return raw image bytes from the job payload (event.evidence or legacy format)."""
+    if event := job.get("event"):
+        if evidence := event.get("evidence"):
+            for ref in evidence:
+                if ref.get("kind") == "motorcycle_crop":
+                    uri = ref.get("uri")
+                    if uri:
+                        p = Path(uri)
+                        if p.exists():
+                            return p.read_bytes()
+                        logger.warning("Evidence path does not exist: %s", p)
     if b64 := job.get("image_b64"):
         return base64.b64decode(b64)
     if path := job.get("image_path"):
         p = Path(path)
         if p.exists():
             return p.read_bytes()
+        logger.warning("Image path does not exist: %s", p)
+    logger.warning("Job has no usable image source: %s", job.get("job_id"))
     raise ValueError(f"Job {job.get('job_id')} has no usable image source.")
 
 
